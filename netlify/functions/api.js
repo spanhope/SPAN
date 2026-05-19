@@ -2,13 +2,14 @@ const serverless = require('serverless-http');
 const express = require('express');
 const path = require('path');
 
-process.chdir(path.join(__dirname));
+const backendPath = path.join(__dirname, '..', 'backend');
+process.chdir(backendPath);
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(backendPath, '..')));
 
 const postsRouter = require('./routes/posts');
 const commentsRouter = require('./routes/comments');
