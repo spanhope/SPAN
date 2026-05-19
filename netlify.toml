@@ -1,11 +1,17 @@
 [build]
   publish = "."
-  command = "echo 'Static site - no build needed'"
+  command = "npm install"
+  base = ""
 
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "none"
+
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/api/*"
+  to = "/.netlify/functions/api"
   status = 200
+  force = true
