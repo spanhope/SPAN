@@ -1,11 +1,10 @@
 const serverless = require('serverless-http');
-const path = require('path');
 
 let app;
 let initDB;
 
 try {
-  const server = require('../../backend/server');
+  const server = require('../backend/server');
   app = server.app;
   initDB = server.initDB;
 } catch (err) {
@@ -14,22 +13,28 @@ try {
 
 let dbInitialized = false;
 
-const wrappedHandler = serverless(app);
-
 exports.handler = async (event, context) => {
+    if (!app) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Server not initialized" })
+        };
+    }
+
     if (!dbInitialized && initDB) {
         try {
             await initDB();
             dbInitialized = true;
-            console.log("Database initialized in Serverless environment.");
+            console.log("Database initialized");
         } catch (err) {
-            console.error("Failed to initialize database:", err);
+            console.error("DB Init Failed:", err.message);
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: "Internal Server Error: DB Init Failed" })
+                body: JSON.stringify({ error: "DB Init Failed" })
             };
         }
     }
     
-    return await wrappedHandler(event, context);
+    const handler = serverless(app);
+    return await handler(event, context);
 };
