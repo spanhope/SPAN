@@ -1,9 +1,12 @@
+const path = require('path');
+
 const serverless = require('serverless-http');
 
 let app;
 let initDB;
 
 try {
+  process.chdir(path.join(__dirname, '..'));
   const server = require('../backend/server');
   app = server.app;
   initDB = server.initDB;
