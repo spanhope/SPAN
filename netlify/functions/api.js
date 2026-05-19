@@ -6,7 +6,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'SPAN API is running', env: process.env.TURSO_DB_URL ? 'Turso connected' : 'No DB' });
+    res.json({ status: 'ok', message: 'SPAN API is running' });
 });
 
 app.get('/api/stats', (req, res) => {
@@ -19,9 +19,8 @@ app.get('/api/stats', (req, res) => {
 });
 
 app.get('/api/posts', (req, res) => {
-    res.json({ data: [], total: 0, message: 'Posts endpoint - needs backend integration' });
+    res.json({ data: [], total: 0 });
 });
 
-module.exports = { app };
-
-exports.handler = serverless(app);
+const handler = serverless(app);
+module.exports = { handler };
