@@ -17,7 +17,6 @@ function extractPublicIdFromUrl(url) {
     return null;
 }
 
-// GET /api/posts — list posts with optional search, category, pagination
 router.get('/', async (req, res, next) => {
     try {
         const { search = '', category = '', page = 1, limit = 10 } = req.query;
@@ -44,7 +43,6 @@ router.get('/', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// GET /api/posts/:id — single post
 router.get('/:id', async (req, res, next) => {
     try {
         const post = await get('SELECT * FROM posts WHERE id = ?', [req.params.id]);
@@ -53,7 +51,6 @@ router.get('/:id', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// POST /api/posts/:id/like — increment like count
 router.post('/:id/like', async (req, res, next) => {
     try {
         const post = await get('SELECT id FROM posts WHERE id = ?', [req.params.id]);
@@ -64,9 +61,6 @@ router.post('/:id/like', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// ── Admin-only routes (require JWT) ──────────────────────────────────────────
-
-// POST /api/posts — create a new post
 router.post('/', requireAuth, async (req, res, next) => {
     try {
         const { title, image, excerpt, content, author, date, category, is_html } = req.body;
@@ -89,7 +83,6 @@ router.post('/', requireAuth, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// PUT /api/posts/:id — update a post
 router.put('/:id', requireAuth, async (req, res, next) => {
     try {
         const post = await get('SELECT * FROM posts WHERE id = ?', [req.params.id]);
@@ -107,7 +100,6 @@ router.put('/:id', requireAuth, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// DELETE /api/posts/:id — delete a post and its comments
 router.delete('/:id', requireAuth, async (req, res, next) => {
     let cloudinaryDeleted = false;
     let publicId = null;

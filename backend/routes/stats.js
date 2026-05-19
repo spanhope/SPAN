@@ -3,7 +3,6 @@ const router = express.Router();
 const { get, all, run } = require('../db');
 const requireAuth = require('../middleware/auth');
 
-// GET /api/stats — public: get all stats
 router.get('/', async (req, res) => {
     try {
         const stats = await all('SELECT * FROM stats ORDER BY id');
@@ -14,7 +13,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/stats/:key — get single stat
 router.get('/:key', async (req, res) => {
     try {
         const stat = await get('SELECT * FROM stats WHERE key = ?', [req.params.key]);
@@ -28,7 +26,6 @@ router.get('/:key', async (req, res) => {
     }
 });
 
-// PUT /api/stats/:key — admin only: update a stat
 router.put('/:key', requireAuth, async (req, res) => {
     try {
         const { key } = req.params;

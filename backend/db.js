@@ -1,19 +1,10 @@
 const { createClient } = require('@libsql/client');
 
-// ── Turso / libsql client ─────────────────────────────────────────────────────
-// For local development without Turso, set TURSO_DB_URL to a file: URL, e.g.:
-//   TURSO_DB_URL=file:./blog.db   (no auth token needed for local file)
 const client = createClient({
   url: process.env.TURSO_DB_URL || 'file:./blog.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,   // undefined is fine for local file URL
+  authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-// ── Compatibility helpers  (same API that all routes already use) ──────────────
-
-/**
- * run(sql, params)  →  { lastInsertRowid, rowsAffected }
- * Normalised to match the old sqlite3 shape ({ lastID, changes }).
- */
 const run = async (sql, params = []) => {
   const result = await client.execute({ sql, args: params });
   return {
@@ -22,27 +13,17 @@ const run = async (sql, params = []) => {
   };
 };
 
-/**
- * get(sql, params)  →  first row as plain object, or undefined
- */
 const get = async (sql, params = []) => {
   const result = await client.execute({ sql, args: params });
   return result.rows[0] ?? undefined;
 };
 
-/**
- * all(sql, params)  →  array of plain objects
- */
 const all = async (sql, params = []) => {
   const result = await client.execute({ sql, args: params });
   return result.rows;
 };
 
-// ── Schema initialisation (runs once at startup) ──────────────────────────────
 async function initDB() {
-  // WAL pragma – Turso manages this internally; skip for remote connections
-  // db.run('PRAGMA journal_mode = WAL');
-
   await client.execute(`
         CREATE TABLE IF NOT EXISTS posts (
             id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,12 +40,10 @@ async function initDB() {
         )
     `);
 
-  // Migration: add is_html column if missing (safe on Turso – will error if
-  // column already exists, so we swallow the error)
   try {
     await client.execute('ALTER TABLE posts ADD COLUMN is_html INTEGER NOT NULL DEFAULT 0');
     await client.execute('UPDATE posts SET is_html = 1');
-  } catch (_) { /* column already exists – that's fine */ }
+  } catch (_) { }
 
   await client.execute(`
         CREATE TABLE IF NOT EXISTS comments (
@@ -157,7 +136,6 @@ async function initDB() {
         )
     `);
 
-  // Seed admin user if empty
   const adminCount = await get('SELECT COUNT(*) as count FROM admin_users');
   if ((adminCount?.count ?? 0) == 0) {
     const bcrypt = require('bcrypt');
@@ -166,7 +144,6 @@ async function initDB() {
     console.log('✅ Default admin user seeded with hashed password.');
   }
 
-  // Seed stats if empty
   const statsCount = await get('SELECT COUNT(*) as count FROM stats');
   if ((statsCount?.count ?? 0) == 0) {
     const initStats = [
@@ -180,7 +157,6 @@ async function initDB() {
     }
   }
 
-  // ── Seed blog categories if empty ─────────────────────────────────────────
   const bCatCount = await get('SELECT COUNT(*) as count FROM blog_categories');
   if ((bCatCount?.count ?? 0) == 0) {
     const initBCats = ['Health & Medical', 'Social Welfare', 'International Aid', 'Disability', 'Poor Education', 'Animals & Pets', 'General'];
@@ -189,7 +165,6 @@ async function initDB() {
     }
   }
 
-  // ── Seed gallery categories if empty ──────────────────────────────────────
   const gCatCount = await get('SELECT COUNT(*) as count FROM gallery_categories');
   if ((gCatCount?.count ?? 0) == 0) {
     const initGCats = [
@@ -203,7 +178,6 @@ async function initDB() {
     }
   }
 
-  // ── Seed posts if empty ───────────────────────────────────────────────────
   const postCount = await get('SELECT COUNT(*) as count FROM posts');
   if ((postCount?.count ?? 0) == 0) {
     const POSTS = [
@@ -243,7 +217,6 @@ async function initDB() {
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
         [p.title, p.image, p.excerpt, p.content, p.author, p.date, p.category, p.likes, p.comments_count]
       );
-      // Seed two comments on the first post
       if (lastID === 1) {
         await run(`INSERT INTO comments (post_id, name, email, message, created_at) VALUES (?, ?, ?, ?, ?)`,
           [1, 'Scott William', 'scott@example.com', 'This is truly inspiring work. SPAN has made such a difference in our community.', '2024-08-31T10:00:00']);
@@ -255,7 +228,6 @@ async function initDB() {
     console.log('✅ Database seeded with sample posts and comments.');
   }
 
-  // ── Seed testimonials if empty ─────────────────────────────────────────────
   const testCount = await get('SELECT COUNT(*) as count FROM testimonials');
   if ((testCount?.count ?? 0) == 0) {
     const TESTIMONIALS = [
@@ -266,7 +238,7 @@ async function initDB() {
       },
       {
         quote: "Magna aliqua. Ut enim and minim veniam quis nostrud exercitation ullamco laboris nis aliquip ex ea comodo consequat. Duis aute irure dolor insy reprehenderit op luptate velit.",
-        author: "Daowp johns",
+        author: "Daowp Johns",
         designation: "Donator"
       },
       {
@@ -284,5 +256,4 @@ async function initDB() {
   console.log('✅ Database initialised and connected to Turso.');
 }
 
-// Export client for edge cases, plus the three helpers every route uses
 module.exports = { db: client, run, get, all, initDB };

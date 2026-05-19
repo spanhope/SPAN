@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { run, get, all } = require('../db');
 
-// GET /api/posts/:id/comments
 router.get('/', async (req, res, next) => {
     try {
         const post = await get('SELECT id FROM posts WHERE id = ?', [req.params.id]);
@@ -15,7 +14,6 @@ router.get('/', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// POST /api/posts/:id/comments
 router.post('/', async (req, res, next) => {
     try {
         const { name, email, message } = req.body;

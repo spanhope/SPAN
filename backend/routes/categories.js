@@ -3,7 +3,6 @@ const router = express.Router();
 const { run, all, get } = require('../db');
 const jwt = require('jsonwebtoken');
 
-// Inline auth middleware for protected routes
 function verifyToken(req, res, next) {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
@@ -16,14 +15,8 @@ function verifyToken(req, res, next) {
     }
 }
 
-// ============================================================================
-// BLOG CATEGORIES
-// ============================================================================
-
-// GET /api/categories/blog (Public)
 router.get('/blog', async (req, res, next) => {
     try {
-        // Return active categories sorted by usage count, then name
         const categories = await all(`
             SELECT bc.id, bc.name, COUNT(p.id) as usage_count
             FROM blog_categories bc
@@ -35,7 +28,6 @@ router.get('/blog', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// POST /api/categories/blog (Admin Only)
 router.post('/blog', verifyToken, async (req, res, next) => {
     try {
         const { name } = req.body;
@@ -51,7 +43,6 @@ router.post('/blog', verifyToken, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// DELETE /api/categories/blog/:id (Admin Only)
 router.delete('/blog/:id', verifyToken, async (req, res, next) => {
     try {
         await run('DELETE FROM blog_categories WHERE id = ?', [req.params.id]);
@@ -59,11 +50,6 @@ router.delete('/blog/:id', verifyToken, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// ============================================================================
-// GALLERY CATEGORIES
-// ============================================================================
-
-// GET /api/categories/gallery (Public)
 router.get('/gallery', async (req, res, next) => {
     try {
         const categories = await all(`
@@ -77,14 +63,12 @@ router.get('/gallery', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// POST /api/categories/gallery (Admin Only)
 router.post('/gallery', verifyToken, async (req, res, next) => {
     try {
         const { name } = req.body;
         if (!name || !name.trim()) return res.status(400).json({ error: 'Category name is required' });
 
         const trimmedName = name.trim();
-        // Generate a URL-safe slug (e.g., "Health & Medical" -> "health-medical")
         const slug = trimmedName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
         if (!slug) return res.status(400).json({ error: 'Invalid category name' });
@@ -98,7 +82,6 @@ router.post('/gallery', verifyToken, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// DELETE /api/categories/gallery/:id (Admin Only)
 router.delete('/gallery/:id', verifyToken, async (req, res, next) => {
     try {
         await run('DELETE FROM gallery_categories WHERE id = ?', [req.params.id]);
@@ -106,7 +89,6 @@ router.delete('/gallery/:id', verifyToken, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// Backward compatibility for old blog frontend fetching basic counts
 router.get('/', async (req, res, next) => {
     try {
         const categories = await all('SELECT category AS name, COUNT(*) AS count FROM posts GROUP BY category ORDER BY count DESC');

@@ -1,2 +1,2 @@
-// Global Configuration — Backend hosted on Render
-window.SPAN_API_URL = 'https://span-website.onrender.com/api';
+// Global Configuration — Works locally and on Netlify
+window.SPAN_API_URL = '/api';

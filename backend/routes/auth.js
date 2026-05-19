@@ -4,11 +4,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { get } = require('../db');
 
-/**
- * POST /api/auth/login
- * Body: { email, password }
- * Response: { token, expiresIn }
- */
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -34,10 +29,6 @@ router.post('/login', async (req, res) => {
     res.json({ token, expiresIn, email: admin.email });
 });
 
-/**
- * POST /api/auth/verify
- * Verifies a token and returns the payload (used by frontend on page load)
- */
 router.post('/verify', (req, res) => {
     const { token } = req.body;
     if (!token) return res.status(400).json({ error: 'Token required' });

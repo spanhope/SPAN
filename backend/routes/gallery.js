@@ -2,11 +2,8 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { run, get, all } = require('../db');
-// const fs = require('fs');    // Not needed – file deletion is handled by Cloudinary
-// const path = require('path');
 const cloudinary = require('../config/cloudinary');
 
-// Inline auth middleware (auth.js does not export a middleware function)
 function verifyToken(req, res, next) {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
@@ -19,9 +16,6 @@ function verifyToken(req, res, next) {
     }
 }
 
-
-// ── GET /api/gallery  — public ──────────────────────────────────────────────
-// Optional ?tag=slug
 router.get('/', async (req, res, next) => {
     try {
         const { tag } = req.query;
@@ -37,8 +31,6 @@ router.get('/', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// ── POST /api/gallery  — admin only ─────────────────────────────────────────
-// Body: { image, public_id, title, tag }
 router.post('/', verifyToken, async (req, res, next) => {
     try {
         const { image, public_id, title, tag } = req.body;
@@ -54,25 +46,11 @@ router.post('/', verifyToken, async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
-// ── DELETE /api/gallery/:id  — admin only ───────────────────────────────────
 router.delete('/:id', verifyToken, async (req, res, next) => {
     try {
         const photo = await get('SELECT * FROM gallery_photos WHERE id = ?', [req.params.id]);
         if (!photo) return res.status(404).json({ error: 'Photo not found' });
 
-        // ── Local file delete (commented out – using Cloudinary instead) ──
-        // if (photo.public_id) {
-        //     try {
-        //         const filepath = path.join(__dirname, '../../uploads', photo.public_id);
-        //         if (fs.existsSync(filepath)) {
-        //             fs.unlinkSync(filepath);
-        //         }
-        //     } catch (e) {
-        //         console.warn('Local file delete warning:', e.message);
-        //     }
-        // }
-
-        // Delete from Cloudinary if a public_id is stored
         if (photo.public_id) {
             try {
                 await cloudinary.uploader.destroy(photo.public_id);
