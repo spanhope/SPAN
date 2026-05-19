@@ -1,17 +1,12 @@
 [build]
   publish = "."
   command = "npm install"
-  base = ""
-
-[build.environment]
-  NODE_VERSION = "18"
 
 [functions]
   directory = "netlify/functions"
-  node_bundler = "none"
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api"
+  to = "/.netlify/functions/api/:splat"
   status = 200
   force = true
