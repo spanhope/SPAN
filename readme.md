@@ -139,8 +139,6 @@ span-website/
 
 ### Default Admin Account
 
-- **Email**: admin@span.com
-- **Password**: adminspanhope@1234
 
 > **Important**: Change this password immediately after first login!
 
