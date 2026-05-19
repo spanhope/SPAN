@@ -3,23 +3,22 @@ const express = require('express');
 const path = require('path');
 
 const backendPath = path.join(__dirname, '..', 'backend');
-process.chdir(backendPath);
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(backendPath, '..')));
+app.use(express.static(path.join(__dirname, '..')));
 
-const postsRouter = require('./routes/posts');
-const commentsRouter = require('./routes/comments');
-const categoriesRouter = require('./routes/categories');
-const newsletterRouter = require('./routes/newsletter');
-const uploadRouter = require('./routes/upload');
-const authRouter = require('./routes/auth');
-const galleryRouter = require('./routes/gallery');
-const testimonialsRouter = require('./routes/testimonials');
-const statsRouter = require('./routes/stats');
+const postsRouter = require(path.join(backendPath, 'routes', 'posts'));
+const commentsRouter = require(path.join(backendPath, 'routes', 'comments'));
+const categoriesRouter = require(path.join(backendPath, 'routes', 'categories'));
+const newsletterRouter = require(path.join(backendPath, 'routes', 'newsletter'));
+const uploadRouter = require(path.join(backendPath, 'routes', 'upload'));
+const authRouter = require(path.join(backendPath, 'routes', 'auth'));
+const galleryRouter = require(path.join(backendPath, 'routes', 'gallery'));
+const testimonialsRouter = require(path.join(backendPath, 'routes', 'testimonials'));
+const statsRouter = require(path.join(backendPath, 'routes', 'stats'));
 
 app.use('/api/auth', authRouter);
 app.use('/api/posts', postsRouter);
@@ -40,7 +39,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-const { initDB } = require('./db');
+const { initDB } = require(path.join(backendPath, 'db'));
 
 initDB().then(() => {
     console.log('Database initialized');
