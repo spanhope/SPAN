@@ -63,27 +63,65 @@ We chose SQLite for several important reasons:
 ```
 span-website/
 ├── index.html              # Main homepage
-├── about.html            # About page
-├── blog.html            # Blog listing page
-├── blog-single.html     # Single blog post page
-├── contact.html         # Contact page
-├── css/                 # Stylesheets
-├── js/                  # Frontend JavaScript
-├── icons/               # Icon assets
-├── admin/               # Admin panel
-│   ├── index.html       # Admin dashboard
-│   ├── login.html      # Admin login
-│   ├── js/            # Admin JavaScript
-│   ├── css/            # Admin styles
-│   └── html/           # Admin HTML modules
-├── backend/             # Node.js backend
-│   ├── server.js       # Express server
-│   ├── db.js           # Database configuration
-│   ├── routes/         # API routes
-│   ├── config/         # Configuration files
-│   ├── middleware/     # Express middleware
-│   └── package.json    # Backend dependencies
-└── readme.md           # This file
+├── about.html              # About page
+├── blog.html               # Blog listing page
+├── blog-single.html        # Single blog post page
+├── contact.html            # Contact page
+├── package.json            # Root package.json
+├── vercel.json             # Vercel deployment config
+├── render.yaml             # Render deployment config
+├── netlify.toml            # Netlify deployment config
+├── sendemail.php           # PHP email handler
+├── readme.md               # This file
+│
+├── admin/                  # Admin panel
+│   ├── index.html          # Admin dashboard
+│   ├── login.html          # Admin login
+│   ├── css/                # Admin styles
+│   │   └── modules/        # CSS modules
+│   ├── html/               # Admin HTML modules
+│   │   └── modules/        # HTML modules
+│   └── js/                 # Admin JavaScript
+│       └── modules/        # JS modules
+│
+├── backend/                # Node.js backend
+│   ├── server.js           # Express server
+│   ├── db.js               # Database configuration
+│   ├── .env                # Environment variables (local)
+│   ├── .env.example        # Environment variables template
+│   ├── blog.db             # SQLite database
+│   ├── package.json        # Backend dependencies
+│   ├── test.js             # Backend test file
+│   ├── config/             # Configuration files
+│   ├── middleware/          # Express middleware
+│   └── routes/             # API routes
+│
+├── css/                    # Stylesheets
+│   └── images/             # CSS images
+│
+├── fonts/                  # Custom fonts
+│
+├── icons/                  # Icon assets
+│   ├── demo-files/         # Icon demos
+│   └── fonts/              # Icon fonts
+│
+├── images/                 # Image assets
+│   ├── background/         # Background images
+│   ├── clients/            # Client logos
+│   ├── fancybox/           # Fancybox images
+│   ├── gallery/            # Gallery images
+│   ├── icons/              # Icon images
+│   ├── main-slider/        # Main slider images
+│   ├── my stock/           # Stock images
+│   └── resource/           # Resource images
+│
+├── js/                     # Frontend JavaScript
+│
+├── netlify/                # Netlify functions
+│   └── functions/          # Serverless functions
+│       └── api.js          # API function
+│
+└── uploads/                # Uploaded files
 ```
 
 ## Getting Started
